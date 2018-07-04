@@ -1,0 +1,295 @@
+package xmlParse;
+
+import java.io.*;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
+
+public class ReadXMLFile {
+
+	public static void findTimeEntry(File xmlFile) {
+
+		String timeEntryString = "";
+
+		try {
+
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			Document doc = dBuilder.parse(xmlFile);
+
+			doc.getDocumentElement().normalize();
+
+			NodeList nList = doc.getElementsByTagName("time-entry");
+
+			for (int temp = 0; temp < nList.getLength(); temp++) {
+
+				Node nNode = nList.item(temp);
+
+				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+
+					Element eElement = (Element) nNode;
+
+					timeEntryString += (eElement.getElementsByTagName("person-id").item(0).getTextContent() + "; ");	//Person-ID
+					timeEntryString += ("; ; ");
+					timeEntryString += (eElement.getElementsByTagName("project-id").item(0).getTextContent() + "; ");	//Project-ID
+					timeEntryString += ("; ; ; ; ");
+					timeEntryString += (eElement.getElementsByTagName("todo-item-id").item(0).getTextContent() + "; ");	//Todo-Item-ID
+					timeEntryString += ("; ; ; ; ");
+					timeEntryString += (eElement.getElementsByTagName("id").item(0).getTextContent() + "; ");			//Time-Entry-ID
+					timeEntryString += (eElement.getElementsByTagName("date").item(0).getTextContent() + "; ");			//Time-Entry-Date
+					timeEntryString += (eElement.getElementsByTagName("description").item(0).getTextContent()			//Time-Entry-Beschreibung
+							.replaceAll("\r", "").replaceAll("\n", "").replace(";", "§") + "; ");
+					timeEntryString += (eElement.getElementsByTagName("hours").item(0).getTextContent() + "\r\n");		//Time-Entry-Zeiten
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		FileWriter fwTE;
+		try {
+			fwTE = new FileWriter("/Users/adojo/Documents/P1_/CSV-Daten/Time-Entries.csv");
+			PrintWriter pwTE = new PrintWriter(fwTE);
+			pwTE.print(timeEntryString);
+			pwTE.close();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		System.out.println("Zeiteinträge sind Fertig");
+
+	}
+
+	public static void findTodoList(File xmlFile) {
+
+		String todoListString = "";
+
+		try {
+
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			Document doc = dBuilder.parse(xmlFile);
+
+			doc.getDocumentElement().normalize();
+
+			NodeList nList = doc.getElementsByTagName("todo-list");
+
+			for (int temp = 0; temp < nList.getLength(); temp++) {
+
+				Node nNode = nList.item(temp);
+
+				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+
+					Element eElement = (Element) nNode;
+
+					todoListString += ("; ; ; ");
+					todoListString += (eElement.getElementsByTagName("project-id").item(0).getTextContent() + "; ");	//Project-ID
+					todoListString += ("; ; ");
+					todoListString += (eElement.getElementsByTagName("id").item(0).getTextContent() + "; ");			//Todo-List-ID
+					todoListString += (eElement.getElementsByTagName("name").item(0).getTextContent() + "; ");			//Todo-List-Name
+					todoListString += ("; ; ; ; ; ; ; ; " + "\r\n");
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		FileWriter fwTL;
+		try {
+			fwTL = new FileWriter("/Users/adojo/Documents/P1_/CSV-Daten/Todo-Lists.csv");
+			PrintWriter pwTL = new PrintWriter(fwTL);
+			pwTL.print(todoListString);
+			pwTL.close();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		System.out.println("Todo-Listen sind fertig");
+
+	}
+
+	public static void findTodoItem(File xmlFile) {
+
+		String todoItemString = "";
+
+		try {
+
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			Document doc = dBuilder.parse(xmlFile);
+
+			doc.getDocumentElement().normalize();
+
+			NodeList nList = doc.getElementsByTagName("todo-item");
+
+			for (int temp = 0; temp < nList.getLength(); temp++) {
+
+				Node nNode = nList.item(temp);
+
+				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+
+					Element eElement = (Element) nNode;
+
+					todoItemString += ("; ; ; ; ; ; ; ;");
+					todoItemString += (eElement.getElementsByTagName("id").item(0).getTextContent() + "; ");		//Todo-Item-ID
+					todoItemString += (eElement.getElementsByTagName("content").item(0).getTextContent())
+							.replaceAll("\r", "").replaceAll("\n", "").replace(";", "§") + "; ";					//Todo-Item-Inhalt
+					todoItemString += (eElement.getElementsByTagName("completed").item(0).getTextContent() + "; ");	//Todo-Item-Completed
+					todoItemString += (eElement.getElementsByTagName("creator-id").item(0).getTextContent() + "; ");//Todo-Item-Creator
+					if (eElement.getElementsByTagName("completed").equals(true)) {
+						todoItemString += (eElement.getElementsByTagName("completed-on").item(0).getTextContent()	//Todo-Item-Completed-nn
+								+ "; ");
+					} else {
+						todoItemString += ("; ");
+					}
+					todoItemString += ("; ; ; " + "\r\n");
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		FileWriter fwTI;
+		try {
+			fwTI = new FileWriter("/Users/adojo/Documents/P1_/CSV-Daten/Todo-Items.csv");
+			PrintWriter pwTI = new PrintWriter(fwTI);
+			pwTI.print(todoItemString);
+			pwTI.close();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		System.out.println("Todo-Items sind fertig");
+
+	}
+
+	public static void findProjects(File xmlFile) {
+
+		String projectString = "";
+
+		try {
+
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			Document doc = dBuilder.parse(xmlFile);
+
+			doc.getDocumentElement().normalize();
+
+			NodeList nList = doc.getElementsByTagName("project");
+
+			for (int temp = 0; temp < nList.getLength(); temp++) {
+
+				Node nNode = nList.item(temp);
+
+				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+
+					Element eElement = (Element) nNode;
+
+					projectString += ("; ; ; ");
+					projectString += (eElement.getElementsByTagName("id").item(0).getTextContent() + "; ");		//Project-ID
+					projectString += (eElement.getElementsByTagName("name").item(0).getTextContent() + "; ");	//Project-Name
+					projectString += (eElement.getElementsByTagName("status").item(0).getTextContent() + "; ");	//Project-Status
+					projectString += ("; ; ; ; ; ; ; ; ; ; " + "\r\n");
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		FileWriter fwPro;
+		try {
+			fwPro = new FileWriter("/Users/adojo/Documents/P1_/CSV-Daten/Projects.csv");
+			PrintWriter pwPro = new PrintWriter(fwPro);
+			pwPro.print(projectString);
+			pwPro.close();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		System.out.println("Projecte sind Fertig");
+
+	}
+
+	public static void findPerson(File xmlFile) {
+
+		String personString = "";
+
+		try {
+
+			DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+			Document doc = dBuilder.parse(xmlFile);
+
+			doc.getDocumentElement().normalize();
+
+			NodeList nList = doc.getElementsByTagName("person");
+
+			for (int temp = 0; temp < nList.getLength(); temp++) {
+
+				Node nNode = nList.item(temp);
+
+				if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+
+					Element eElement = (Element) nNode;
+
+					personString += (eElement.getElementsByTagName("id").item(0).getTextContent() + "; ");		//Person-ID
+					personString += (eElement.getElementsByTagName("name").item(0).getTextContent() + "; ");	//Person-Name
+					personString += (eElement.getElementsByTagName("title").item(0).getTextContent() + "; ");	//Person-Title
+					personString += ("; ; ; ; ; ; ; ; ; ; ; ; ; " + "\r\n");
+				}
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+
+		FileWriter fwPer;
+		try {
+			fwPer = new FileWriter("/Users/adojo/Documents/P1_/CSV-Daten/People.csv");
+			PrintWriter pwPer = new PrintWriter(fwPer);
+			pwPer.print(personString);
+			pwPer.close();
+
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+
+		System.out.println("Personen sind Fertig");
+
+	}
+
+	public static void main(String argv[]) {
+
+		File fXmlFile = new File("/Users/adojo/Documents/P1_/adojo-20180601112010.xml");
+		String überschrift = "Person-ID; Person-Name; Person-Title; Project-ID; Project-Name; Project-Status; Todo-List-ID; Todo-List-Name; Todo-Item-ID; Todo-Item-Inhalt; Todo-Item-Completed; Todo-Item-Creator; Todo-Item-Completed-on; Time-Entry-ID; Time-Entry-Date; Time-Entry-Beschreibung; Time-Entry-Zeiten\r\n";
+		
+		/*
+		 * File fPerson = new File("/Users/adojo/Documents/P1_/CSV-Daten/People.txt");
+		 * File fProjects = new
+		 * File("/User/adojo/Documents/P1_/CSV-Daten/Projects.csv"); File fTodoList =
+		 * new File("/User/adojo/Documents/P1_/CSV-Daten/TodoList.csv"); File fTodoItem
+		 * = new File("/User/adojo/Documents/P1_/CSV-Daten/Todo-Item.csv"); File
+		 * fTimeEntry = new File("/User/adojo/Documents/P1_/CSV-Daten/Time-Entry.csv");
+		 */
+
+		// findPerson(fXmlFile);
+		// findProjects(fXmlFile);
+		// findTodoList(fXmlFile);
+		// findTodoItem(fXmlFile);
+		findTimeEntry(fXmlFile);
+
+		System.out.println("FERTIG");
+
+	
+		// System.out.print(TodoItem);
+	}
+
+}
